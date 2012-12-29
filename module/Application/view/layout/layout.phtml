@@ -16,7 +16,9 @@
         <!-- Scripts -->
         <?php echo $this->headScript()->prependFile($this->basePath() . '/js/html5.js', 'text/javascript', array('conditional' => 'lt IE 9',))
                                       ->prependFile($this->basePath() . '/js/bootstrap.min.js')
-                                      ->prependFile($this->basePath() . '/js/jquery.min.js') ?>
+                                      ->prependFile($this->basePath() . '/js/validation.js')
+                                      ->prependFile($this->basePath() . '/js/jquery.min.js')
+                                        ?>
 
     </head>
     <body>
@@ -32,6 +34,15 @@
                     <div class="nav-collapse collapse">
                         <ul class="nav">
                             <li class="active"><a href="<?php echo $this->url('home') ?>"><?php echo $this->translate('Home') ?></a></li>
+                            <li class="active"><a href="<?php echo $this->url('country', array(
+                                                                                        'action' => 'add',
+                                                                                        'code'     => $this->code,
+                                                                                     ));
+                            ?>"><?php echo $this->translate('Add Country') ?></a></li>
+                            <li class="active"><a href="<?php echo $this->url('country', array(
+                                                                                        'action' => 'add-city',
+                                                                                        'code'     => $this->code,
+    )); ?>"><?php echo $this->translate('Add City') ?></a></li>
                         </ul>
                     </div><!--/.nav-collapse -->
                 </div>
@@ -41,7 +52,7 @@
             <?php echo $this->content; ?>
             <hr>
             <footer>
-                <p>&copy; 2005 - 2012 by Zend Technologies Ltd. <?php echo $this->translate('All rights reserved.') ?></p>
+                <p>&copy; 2005 - 2012 <?php echo $this->translate('All rights reserved.') ?></p>
             </footer>
         </div> <!-- /container -->
         <?php echo $this->inlineScript() ?>

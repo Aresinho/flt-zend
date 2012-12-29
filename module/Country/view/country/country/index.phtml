@@ -1,0 +1,36 @@
+<?php
+
+$title = 'Countries of The World';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+
+<?php if(!empty($displayMessage)) {
+    echo '<h2>' . $displayMessage . '</h2>';
+} ?>
+
+
+<?php ($userIsLoggedIn) ? $link = '<a class="button" style="float:right;" href="' . $this->url('login', array('action' => 'logout')) .'">Logout</a>' : $link = '<a style="float:right" href="' . $this->url('login',array('action' => 'index')) . '">Login</a>'; 
+    echo $link;
+   ?> 
+
+
+<table class="table">
+<tr>
+    <th>Country Name</th>
+    <th>Continent</th>
+    <th>&nbsp;</th>
+</tr>
+<?php foreach ($countries as $country) :  ?>
+<tr>
+    <td><a href="<?php echo $this->url('country', array('action' => 'details', 'code' => $country->code)); ?>"> <?php echo $this->escapeHtml($country->name);?></a></td>
+    <td><?php echo $this->escapeHtml($country->continent);?></td>
+    <td>
+        <a href="<?php echo $this->url('country',
+            array('action'=>'edit', 'code' => $country->code));?>">Edit</a>
+        <a href="<?php echo $this->url('country',
+            array('action'=>'delete', 'code' => $country->code));?>">Delete</a>
+    </td>
+</tr>
+<?php endforeach; ?>
+</table>

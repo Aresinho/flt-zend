@@ -1,0 +1,115 @@
+<?php
+
+$title = 'Details for ' . $this->escapeHtml($country->name);
+$this->headTitle($title);
+
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+
+<table class="table">
+    <tr><th>Country Capital:</th><td><?php echo $this->escapeHtml($capital->name); ?></td></tr>
+    <tr><th>Total Population:</th><td><?php echo number_format($this->escapeHtml($country->population)); ?></td></tr>
+    <tr><th>Spoken Languages:</th><td><?php 
+    
+        $languageList = '';
+    
+        foreach($languages as $language) {
+            
+            if($language->isOfficial) {
+                $languageList .= '<strong>';
+            }
+            
+            $languageList .= $language->language . ' (' . $language->percentage . '%), ';
+            
+            if($language->isOfficial) {
+                $languageList .= '</strong>';
+            }
+        }
+        
+        echo substr($languageList, 0, -2);
+    
+     ?></td></tr>
+</table>
+
+
+<div id="map_canvas" style="width:100%; height:300px; border:2px solid green"></div>
+<script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?sensor=false">
+    </script>
+    
+<script type="text/javascript">
+     
+    var mapOptions = {
+        center: new google.maps.LatLng(0,0),
+        zoom: 5,
+        minZoom: 5,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+     };
+    
+     var geocoder = new google.maps.Geocoder();
+     var map = new google.maps.Map(document.getElementById("map_canvas"),
+            mapOptions);
+     var bounds = new google.maps.LatLngBounds();  
+     
+    locateCityOnMap("<?php echo $country->name  . ', ' . $country->continent ?>");
+   
+    //Since we are loading this while the DOM is loading we need to wait until the map is fully loaded to
+    //change its bounds.
+    google.maps.event.addListenerOnce(map, 'idle', function(){ 
+        map.fitBounds(bounds);
+    });
+    
+    google.maps.event.addListener(map, 'bounds_changed', function() {
+        var zoom = map.getZoom();
+        
+        if(zoom > 15) {
+            map.setZoom(13);
+        } 
+    });
+   
+    function locateCityOnMap(address) {
+    
+        geocoder.geocode( { 'address': address }, function(results, status) {
+          if (status == google.maps.GeocoderStatus.OK) {
+            
+            var marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location
+            });
+            
+            lat = results[0].geometry.location.lat();
+            long = results[0].geometry.location.lng()
+            
+            bounds.extend(results[0].geometry.location);
+            
+            
+          } else {
+             //fail silently -- This is likely to happen in countries with a lot of cities. 
+          }
+        });
+      }
+     
+</script>    
+
+<h2>Cities in <?php echo $this->escapeHtml($country->name); ?></h2>
+
+<table class="table">
+<tr>
+    <th>Cities</th>
+    <th>Population</th>
+    <th>&nbsp;</th>
+</tr>
+<?php foreach ($cities as $city) : ?>
+<tr>
+    <td><?php echo $this->escapeHtml($city->name);?></td>
+    <td><?php echo number_format($this->escapeHtml($city->population)); ?></td>
+    <td>
+        <a href="<?php echo $this->url('country',
+            array('action'=>'edit-city', 'code' => $city->id));?>">Edit</a> &nbsp; &nbsp;
+        <a href="<?php echo $this->url('country',
+            array('action'=>'delete-city', 'code' => $city->id));?>">Delete</a>
+        <script> locateCityOnMap("<?php echo $city->name . ', ' . $country->name ?>"); </script>    
+    </td>
+</tr>
+<?php endforeach; ?>
+</table>
